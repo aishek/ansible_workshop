@@ -1,0 +1,25 @@
+- name: Create webserver group
+  group:
+    name: "{{webserver_group}}"
+
+- name: Create webserver user
+  user:
+    name: "{{webserver_user}}"
+    group: "{{webserver_group}}"
+    groups: "{{webserver_group}}"
+    shell: "/bin/bash"
+
+- name: Set up authorized_keys for the deploy user
+  authorized_key:
+    user: "{{ webserver_user }}"
+    key: "{{ item }}"
+  with_file:
+    - "{{ role_path }}/files/public_keys/ab.pub"
+  tags:
+    - authorized_keys
+
+- name: Force terminal color prompt
+  lineinfile:
+    dest: "/home/{{ webserver_user }}/.bashrc"
+    regexp: "^force_color_prompt=yes"
+    line: "force_color_prompt=yes"

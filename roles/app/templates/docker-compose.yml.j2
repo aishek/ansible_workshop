@@ -1,0 +1,25 @@
+version: '3.2'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  blue: &app
+    env_file:
+      - app_variables.env
+    image: aishek/docker_on_rails2:1.0.0
+    restart: always
+    healthcheck:
+      test: curl -sS http://localhost:3000/healthcheck || exit 1
+      interval: 30s
+      timeout: 3s
+      retries: 30
+
+  green:
+    <<: *app
+

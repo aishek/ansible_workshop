@@ -1,0 +1,11 @@
+---
+- hosts: web
+  roles:
+    - common
+    - role: app
+      tags: app
+- hosts: db
+  roles:
+    - common
+    - role: database
+      tags: db

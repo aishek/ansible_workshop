@@ -1,0 +1,36 @@
+- name: Add docker repo key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add docker repo
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+    state: present
+
+- name: Install docker
+  apt:
+    update_cache: true
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+- name: Check if docker-compose installed
+  stat:
+    path: "/usr/local/bin/docker-compose"
+  register: docker_compose
+
+- name: Download docker-compose
+  command: curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+  args:
+    warn: false
+  when: not docker_compose.stat.exists
+
+- name: Ensure docker-compose is executable
+  file:
+    path: /usr/local/bin/docker-compose
+    mode: 'a+x'
+  when: not docker_compose.stat.exists
+
+

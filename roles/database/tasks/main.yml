@@ -1,0 +1,30 @@
+- name: Install postgresql
+  apt:
+    update_cache: true
+    name:
+      - postgresql-12
+      - postgresql-client-12
+
+- name: Listen external IP
+  lineinfile:
+    dest: "/etc/postgresql/12/main/postgresql.conf"
+    regexp: "^listen_addresses='{{ db_host }}'"
+    line: "listen_addresses='{{ db_host }}'"
+  register: db_config
+
+- name: Ensure access configured
+  template:
+    src: pg_hba.conf.j2
+    dest: "/etc/postgresql/12/main/pg_hba.conf"
+    mode: 0640
+    owner: postgres
+    group: postgres
+  register: pg_hba
+
+- name: Restart postgresql service
+  systemd:
+    name: postgresql.service
+    state: restarted
+  when: db_config.changed or pg_hba.changed
+
+- include: credentials.yml

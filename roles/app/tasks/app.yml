@@ -1,0 +1,28 @@
+- name: Ensure app directory exists
+  file:
+    path: /app
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure app variables are configured
+  template:
+    src: app_variables.env.j2
+    dest: "/app/app_variables.env"
+    mode: 0640
+    owner: root
+    group: root
+
+- name: Ensure docker-compose is configured
+  template:
+    src: docker-compose.yml.j2
+    dest: "/app/docker-compose.yml"
+    mode: 0640
+    owner: root
+    group: root
+
+- name: Enable docker service
+  systemd:
+    name: docker
+    enabled: yes

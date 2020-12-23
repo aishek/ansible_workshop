@@ -1,0 +1,2 @@
+webserver_group: deploy
+webserver_user: deploy

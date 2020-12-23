@@ -1,0 +1,2 @@
+- include: install-docker-compose.yml
+- include: app.yml
