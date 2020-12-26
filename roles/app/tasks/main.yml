@@ -1,2 +1,3 @@
 - include: install-docker-compose.yml
+- include: install-redis.yml
 - include: app.yml

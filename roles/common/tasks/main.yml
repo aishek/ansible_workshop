@@ -2,6 +2,11 @@
   group:
     name: "{{webserver_group}}"
 
+# - name: Test for var
+#   debug:
+#     msg: "Hello all!"
+#   tags: test
+
 - name: Create webserver user
   user:
     name: "{{webserver_user}}"
@@ -9,7 +14,7 @@
     groups: "{{webserver_group}}"
     shell: "/bin/bash"
 
-- name: Set up authorized_keys for the deploy user
+- name: Set up authorized_keys for webserver user
   authorized_key:
     user: "{{ webserver_user }}"
     key: "{{ item }}"

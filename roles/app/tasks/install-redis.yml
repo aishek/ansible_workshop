@@ -1,0 +1,4 @@
+- name: Install redis
+  apt:
+    update_cache: true
+    name: redis

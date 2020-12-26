@@ -1,0 +1,42 @@
+---
+- hosts: all
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: Make sure we have a 'wheel' group
+      group:
+        name=wheel
+        state=present
+
+    - name: Create Ansible user
+      user:
+        name: "{{ lookup('env', 'USER') }}"
+        group: users
+        groups: wheel
+        shell: /bin/bash
+
+    - name: Add authorized key
+      authorized_key:
+        user: "{{ lookup('env', 'USER') }}"
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        exclusive: yes
+
+    - name: Allow wheel group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+    - name: Disallow root SSH access
+      lineinfile: dest=/etc/ssh/sshd_config
+                  regexp="^PermitRootLogin"
+                  line="PermitRootLogin no"
+                  state=present
+      register: ssh_access_under_root_disallow
+
+    - name: Restart ssh service
+      systemd:
+        name: ssh.service
+        state: restarted
+      when: ssh_access_under_root_disallow.changed

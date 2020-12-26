@@ -1,10 +1,16 @@
 ---
 - hosts: web
+  remote_user: "{{ lookup('env', 'USER') }}"
+  become: yes
+  vars_files: vars.yml
   roles:
     - common
+    - role: geerlingguy.redis
+      tags: redis
     - role: app
       tags: app
 - hosts: db
+  vars_files: vars.yml
   roles:
     - common
     - role: database
